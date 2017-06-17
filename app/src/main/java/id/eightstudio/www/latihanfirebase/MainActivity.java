@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Fungsi insert update delete bisa di lihat di = https://firebase.google.com/docs/database/admin/retrieve-data
+        //Belajar insert update delete = https://stackoverflow.com/questions/41869606/update-and-delete-data-in-firebase
 
         //Child Added
         databaseReference.child("db_messages").limitToLast(20).addChildEventListener(new ChildEventListener() {
