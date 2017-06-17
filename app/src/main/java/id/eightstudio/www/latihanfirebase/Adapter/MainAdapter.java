@@ -28,6 +28,18 @@ public class MainAdapter extends BaseAdapter {
     inflater = LayoutInflater.from(context);
   }
 
+  //View Holder
+  private class MyViewHolder {
+    private final TextView textView_row_author;
+    private final TextView textView_row_message;
+
+    //Inisialisasi view yang akan di gunakan
+    public MyViewHolder(View item) {
+      textView_row_author = (TextView) item.findViewById(R.id.textView_row_author);
+      textView_row_message = (TextView) item.findViewById(R.id.textView_row_message);
+    }
+  }
+
   @Override
   public int getCount() {
     return data.size();
@@ -47,6 +59,7 @@ public class MainAdapter extends BaseAdapter {
   public View getView(int position, View convertView, ViewGroup parent) {
     MyViewHolder mViewHolder;
 
+    //Cek apakah data null
     if (convertView == null) {
       convertView = inflater.inflate(R.layout.row_message, parent, false);
       mViewHolder = new MyViewHolder(convertView);
@@ -61,6 +74,8 @@ public class MainAdapter extends BaseAdapter {
     if (author_text.length() > 5) {
       author_text = author_text.substring(0, 5);
     }
+
+    //Pastikan sama dengan Model
     mViewHolder.textView_row_author.setText(author_text);
     Calendar cal = Calendar.getInstance(Locale.getDefault());
     cal.setTimeInMillis(currentListData.timestamp * 1000L);
@@ -68,16 +83,9 @@ public class MainAdapter extends BaseAdapter {
 
     mViewHolder.textView_row_message.setText(Html.fromHtml("<font color=\"#333333\">" + currentListData.message + "</font>" + " <small><font color=\"#888888\">" + date + "</font></small>"));
 
+    //Return view
     return convertView;
   }
 
-  private class MyViewHolder {
-    private final TextView textView_row_author;
-    private final TextView textView_row_message;
 
-    public MyViewHolder(View item) {
-      textView_row_author = (TextView) item.findViewById(R.id.textView_row_author);
-      textView_row_message = (TextView) item.findViewById(R.id.textView_row_message);
-    }
-  }
 }

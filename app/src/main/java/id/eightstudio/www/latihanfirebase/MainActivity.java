@@ -29,11 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import id.eightstudio.www.latihanfirebase.Adapter.MainAdapter;
 import id.eightstudio.www.latihanfirebase.Models.Message;
-import id.eightstudio.www.latihanfirebase.Models.Pesan;
 import id.eightstudio.www.latihanfirebase.Utils.MyUtils;
 
 public class MainActivity extends AppCompatActivity {
@@ -76,8 +73,11 @@ public class MainActivity extends AppCompatActivity {
         mainAdapter = new MainAdapter(mContext, messagesList);
         main_listview.setAdapter(mainAdapter);
 
+
+
         test_string = null;
 
+        //Kirim pesan
         button_send.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
 
@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Set user defaulth
         databaseReference.child("users").child(MyUtils.generateUniqueUserId(mContext)).addValueEventListener(new ValueEventListener() {
             @Override public void onDataChange(DataSnapshot dataSnapshot) {
                 username = dataSnapshot.getValue(String.class);
@@ -103,7 +104,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //------------------------------------------------------------
+        //Fungsi insert update delete bisa di lihat di = https://firebase.google.com/docs/database/admin/retrieve-data
+
+        //Child Added
         databaseReference.child("db_messages").limitToLast(20).addChildEventListener(new ChildEventListener() {
             @Override public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Message message = dataSnapshot.getValue(Message.class);
@@ -129,6 +132,50 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Child Changed
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {}
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+                Message message = dataSnapshot.getValue(Message.class);
+                System.out.println("The updated post title is: " + message.message);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {}
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+
+        //Child Remove
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {}
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {}
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Message message = dataSnapshot.getValue(Message.class);
+                System.out.println("The blog post titled " + message.message + " has been deleted");
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {}
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        //Method untuk merekam input data
         editText_message.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
             }
@@ -176,15 +223,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    //Fungsi mengirim pesan
     private void process_message(String message) {
+
         if (message.length() < 1) {
             return;
         }
 
-
-
-        //sends the db to the server.
-        String key = databaseReference.child("db_messages").push().getKey();
+        //Mengirim database ke server
+        String key = databaseReference.child("db_messages").push().getKey();//Menggenerate auto key
         Message post = new Message(MyUtils.generateUniqueUserId(mContext), username, message, System.currentTimeMillis() / 1000L);
         Map<String, Object> postValues = post.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
@@ -192,24 +240,27 @@ public class MainActivity extends AppCompatActivity {
         databaseReference.updateChildren(childUpdates);
     }
 
+    //Create instance Option Menu
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         new MenuInflater(this).inflate(R.menu.main_activity, menu);
         return (super.onCreateOptionsMenu(menu));
     }
 
+    //Option menu untuk ubah user
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case R.id.username:
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
                 final EditText edittext = new EditText(this);
-                alert.setMessage("Do you want to change your username ?");
+                alert.setMessage("Ingin mengganti username ?");
                 alert.setTitle(null);
 
                 username = getSharedPreferences("PREFS", 0).getString("username", "Anonymous");
                 edittext.setText(username);
                 alert.setView(edittext);
-                alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton("Simpan", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String new_username = edittext.getText().toString();
                         mContext.getSharedPreferences("PREFS", 0).edit().putString("username", new_username).commit();
@@ -218,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                alert.setNegativeButton("Batal", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
                     }
@@ -231,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Fungsi untuk menampilkan siapa yang sedang mengetik
     public class MyCountDownTimmer extends CountDownTimer {
 
         public MyCountDownTimmer(long millisInFuture, long countDownInterval) {

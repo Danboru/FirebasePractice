@@ -12,10 +12,9 @@
 
     <TextView
         android:text="Author"
-        android:layout_width="85dp"
+        android:layout_width="90dp"
         android:layout_height="wrap_content"
         android:id="@+id/textView_row_author"
-        android:layout_margin="4dp"
         />
 
     <TextView
@@ -24,7 +23,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView_row_message"
         android:layout_weight="1"
-        android:layout_margin="4dp"
         />
 
   </LinearLayout>
